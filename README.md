@@ -20,14 +20,12 @@ __**Razer Blade Stealth 2018**__
 - **CPU** : Intel Core i7-8550U 4C8T 1.8GHz (4.0GHz turbo)
 - **RAM** : 16GB dual-channel LPDDR3-2133
 - **GPU** : Intel UHD 620
-- **Storage** : Samsung PM981 512GB NVMe M.2
+- **Storage** : LITEON CA3-8D512
 - **Screen** : 13.3" 3200x1800 with touch
-- **WiFi** : Killer AC1535
+- **WiFi** : Broadcom BCM94352Z DW1560 802.11ac Wifi Bluetooth 4.0 M.2
 - **Thunderbolt** : Intel Alpine Ridge JHL6340
 - **Soundcard** : Realtek ALC298
 - **Battery** : 53.6 Wh
-
-However I replaced the SSD with an Samsung 970 EVO and the wifi card with a Lenovo 04X6020.
 
 Hardware compatibility
 ---
@@ -41,32 +39,31 @@ TL;DR -
 - GPU acceleration and video codecs
 - SSD with full speed **[after being replaced]**
 - Wireless (wifi, bt, Continuity, Airdrop) **[after being replaced]**
-- Sleep, lid sleep and lid wake
-- Trackpad including gestures
+- Sleep, lid sleep and lid wake **[seems to work sometimes, best to shutdown and reopen windows]**
 - Touchscreen, also with gestures
-- Sound through headphone jack and speakers (including persistence through sleep)
+- Sound through headphone jack and speakers (including persistence through sleep) **[not so well if you connect a bluetooth speaker]**
 - Internal microphone
-- All USB ports except the USB-C
+- All USB ports including the USB-C port **[although it might be jumpy, or maybe its just my bad cable]**
 - Screen full resolution, brightness
-- HDMI (some graphical glitches at certain resolutions, but they come and go)
 - Battery precentage, charging
 - Changing the keyboard color through some custom apps, also enabling the logo light
-- Internal webcam with Facetime
+- Internal webcam
 - Virtualization (VT-x)
-- SideCar over USB and wireless (in Catalina)
-- iMessage and iCloud (YMMV)
 
 **What does not work:**
 
-- Thunderbolt 3 
-- USB-C functionality on the TB3 port (it can be enabled but it breaks other things)
-- Apple Watch Unlock - something with the third party wifi card causes failure
+- Thunderbolt 3
+- Trackpad including gestures
 - Booting with OpenCore - there are stability issues
 
 **Not tested:**
 
 - Displayport output on the TB3 port
-- Shaving with it
+- Apple Watch Unlock
+- iMessage and iCloud and FaceTime (YMMV)
+- SideCar over USB and wireless (in Catalina)
+- HDMI (some graphical glitches at certain resolutions, but they come and go)
+- Multiple screen resolutions
 
 Much more detailed notes to follow...
 
@@ -91,7 +88,7 @@ SSD
 
 **Here is where you may run into issues.** My model (bought in November 2018) came with a Samsung PM981 SSD. ***This drive will not work in macOS.*** Older models of the computer may come with a Samsung PM961, which seems to work fine. You will need to replace the SSD with a compatible one in order to install. This is a known issue and I have not seen any solution.
 
-Be careful about what you replace it with though. If there are components on the back of the PCB, there may not be enough clearance. I replaced mine with a Samsung 970 EVO, which has all the components on the front of the board, and a compatible controller. 960 series should also work.
+Be careful about what you replace it with though. If there are components on the back of the PCB, there may not be enough clearance. I replaced mine with a LITEON CA3, and a compatible controller. Samsung 970 EVO, 960 series, should also work.
 
 ![970 EVO benchmark](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/nvme_bench.png)
 
@@ -173,20 +170,6 @@ I used the [USBMap](https://github.com/corpnewt/USBMap) script to create the UIA
 
 ![the USB ports i mapped](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/usbmap_info.png)
 
-Display Outs
------
-
-The laptop has an HDMI port and a DisplayPort-over-Thunderbolt 3 as display outputs. I don't have any TB3-DP converters to test that output, but I have gotten HDMI working. Like the internal display, it sometimes flickers at high resolutions and doesn't seem to support 4K60 but it works alright for now.
-
-![displays in system profiler and ioreg](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/display_info.png)
-
-Thunderbolt
------
-
-I have been beta testing al3x's [TbtForcePower.efi](https://github.com/al3xtjames/ThunderboltPkg) to enable the thunderbolt controller in macOS. Having the TB controller enabled is required to use USB-C devices in that port as well, since the TB port has its own USB controller. I do not have any TB3 devices that I can test with, but I do have some USB-C devices and it's somewhat usable. See the USB section for USB-C results. This file is not included because it interferes with sleep.
-
-**Note:** in my experience, with Thunderbolt enabled in the UEFI, some Clover vector themes, like Clovy, seem to run out of memory and hang Clover. If you get stuck on `scan entries`, either use a legacy theme (like the Mojave4k one included in this repo) or disable Thunderbolt in the firmware.
-
 Battery
 -----
 
@@ -233,4 +216,4 @@ The `images` folder has, among other things, the desktop I edited based on the [
 Conclusion?
 ---
 
-Its a pretty good laptop, one might almost mistake it for a dark Macbook. I'm quite satisfied with it. If you want help you can probably find me on the Hackintosh discord: https://discord.gg/uvWNGKV - `@Jazzy#5637`. 
+Its a pretty good laptop, one might almost mistake it for a dark Macbook. I'm quite satisfied with it.
