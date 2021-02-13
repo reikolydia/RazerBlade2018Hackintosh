@@ -216,3 +216,9 @@ Conclusion?
 ---
 
 Its a pretty good laptop, one might almost mistake it for a dark Macbook. I'm quite satisfied with it.
+
+Footnote
+---
+
+
+Big Sur seems to have some issues getting clover to recognize and thus boot. Might need newer versions of clover, but at this stage its best not to proceed with Big Sur.
