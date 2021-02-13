@@ -6,23 +6,24 @@ Razer Blade Stealth (2018) hackintosh
 Intro
 ---
 
-Hey there, I got several requests to release my EFI and show how I made my Razer Bade Stealth Mojave hackintosh, so here it is. This is not a full step-by-step guide, rather a few specific notes (and a full EFI folder) to compliment a full guide like [Corp's](https://hackintosh.gitbook.io/-r-hackintosh-vanilla-desktop-guide/) or [RehabMan's](https://www.tonymacx86.com/threads/guide-booting-the-os-x-installer-on-laptops-with-clover.148093/). This install aims to be as vanilla as possible, so no modifications should be needed to the actual mac operating system files. The only system files I modified were the asset files needed to change the About This Mac display, and the screen resoltion overrides to allow me to run the internal display at 5K HiDPI.
+Hey there, I got several requests to release my EFI and show how I made my Razer Bade Stealth Mojave hackintosh, so here it is. This is not a full step-by-step guide, rather a few specific notes (and a full EFI folder) to compliment a full guide like [Corp's](https://hackintosh.gitbook.io/-r-hackintosh-vanilla-desktop-guide/) or [RehabMan's](https://www.tonymacx86.com/threads/guide-booting-the-os-x-installer-on-laptops-with-clover.148093/). This install aims to be as vanilla as possible, so no modifications should be needed to the actual mac operating system files. The only system files I modified were the asset files needed to change the About This Mac display, and the screen resolution overrides to allow me to run the internal display at 5K HiDPI.
 
 Also, I have tried out the macOS Catalina release and most things work, sleep is buggy though. At least sidecar seems to work fine now on the release.
 
 **Disclaimer:** I am not responsible if you mess up your computer with this setup. I recommend reading everything so you know what you're getting yourself into.
 
-**I do not recommend using the OpenCore EFI!** It's not maintained as often (I made it as an experiement), and causes instability with the trackpad drivers. It's meant for learning.
+**I do not recommend using the OpenCore EFI!** It's not maintained as often (I made it as an experiment), and causes instability with the trackpad drivers. It's meant for learning.
 
 Here is the hardware specification of my Blade as I bought it:
 
 __**Razer Blade Stealth 2018**__
+
 - **CPU** : Intel Core i7-8550U 4C8T 1.8GHz (4.0GHz turbo)
 - **RAM** : 16GB dual-channel LPDDR3-2133
 - **GPU** : Intel UHD 620
 - **Storage** : LITEON CA3-8D512
 - **Screen** : 13.3" 3200x1800 with touch
-- **WiFi** : Broadcom BCM94352Z DW1560 802.11ac Wifi Bluetooth 4.0 M.2
+- **WiFi** : Broadcom BCM94352Z DW1560 802.11ac WiFi Bluetooth 4.0 M.2
 - **Thunderbolt** : Intel Alpine Ridge JHL6340
 - **Soundcard** : Realtek ALC298
 - **Battery** : 53.6 Wh
@@ -30,47 +31,43 @@ __**Razer Blade Stealth 2018**__
 Hardware compatibility
 ---
 
-TL;DR - 
+TL;DR -
 
 **What works:**
 
 - CPU power management
-- Readng CPU temperature
+- Reading CPU temperature
 - GPU acceleration and video codecs
 - SSD with full speed **[after being replaced]**
-- Wireless (wifi, bt, Continuity, Airdrop) **[after being replaced]**
-- Sleep, lid sleep and lid wake **[seems to work sometimes, best to shutdown and reopen windows]**
+- Wireless (WiFi, Bluetooth, Continuity, Airdrop) **[after being replaced]**
+- Sleep, lid sleep and lid wake **[seems to work sometimes, best to shutdown and restart Mac]**
 - Touchscreen, also with gestures
-- Sound through headphone jack and speakers (including persistence through sleep) **[not so well if you connect a bluetooth speaker]**
+- Sound through headphone jack and speakers (including persistence through sleep)
 - Internal microphone
-- All USB ports including the USB-C port **[although it might be jumpy, or maybe its just my bad cable]**
+- All USB ports including the USB-C port
 - Screen full resolution, brightness
-- Battery precentage, charging
+- Battery percentage, charging
 - Changing the keyboard color through some custom apps, also enabling the logo light
 - Internal webcam
 - Virtualization (VT-x)
 
 **What does not work:**
 
-- Thunderbolt 3
-- Trackpad including gestures
+- Thunderbolt 3 and thus Display Port output
+- Trackpad gestures (partially works at times)
 - Booting with OpenCore - there are stability issues
+- HDMI - External displays (needs to be set at a lower resolution for external displays)
 
 **Not tested:**
 
-- Displayport output on the TB3 port
 - Apple Watch Unlock
 - iMessage and iCloud and FaceTime (YMMV)
 - SideCar over USB and wireless (in Catalina)
-- HDMI (some graphical glitches at certain resolutions, but they come and go)
-- Multiple screen resolutions
-
-Much more detailed notes to follow...
 
 CPU
 -----
 
-The [i7-8550U](https://ark.intel.com/products/122589/Intel-Core-i7-8550U-Processor-8M-Cache-up-to-4-00-GHz-) worked pretty well out of the box. I needed to add CPUFriend and a data SSDT (see SSDT-CPUF) to get it to idle below 1.20GHz (it goes down to about 0.80 now), but other than that, power management seems fine and it has plenty of power. I haven't seen it turbo up all the way (usually tops out at about 3.7GHz, although that might be a misconfigured CPUFriend vector or a power limit issue). The SMCProcessor sensors kext worked out of the box for seeing CPU temperature.
+The [i7-8550U](https://ark.intel.com/products/122589/Intel-Core-i7-8550U-Processor-8M-Cache-up-to-4-00-GHz-) worked pretty well out of the box. I needed to add CPUFriend and a data SSDT `see: SSDT-CPUF.dsl` to get it to idle below 1.20GHz (it goes down to about 0.80 now), but other than that, power management seems fine and it has plenty of power. I haven't seen it turbo up all the way (usually tops out at about 3.7GHz, although that might be a misconfigured CPUFriend vector or a power limit issue). The `SMCProcessor.kext` sensors worked out of the box for seeing CPU temperature.
 
 ![screenshot of CPU temp and wattage in HWMonitor](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/hwmon_info.png)
 
@@ -86,31 +83,31 @@ A note about the flickering issue: lately I have noticed that on boot it will fl
 SSD
 -----
 
-**Here is where you may run into issues.** My model (bought in November 2018) came with a Samsung PM981 SSD. ***This drive will not work in macOS.*** Older models of the computer may come with a Samsung PM961, which seems to work fine. You will need to replace the SSD with a compatible one in order to install. This is a known issue and I have not seen any solution.
+**Here is where you may run into issues.** My model (bought in November 2018) came with a Samsung PM961 SSD. ***This drive will not work in macOS.*** Older models of the computer may come with a Samsung PM961, which seems to work fine. You will need to replace the SSD with a compatible one in order to install. This is a known issue and I have not seen any solution.
 
 Be careful about what you replace it with though. If there are components on the back of the PCB, there may not be enough clearance. I replaced mine with a LITEON CA3, and a compatible controller. Samsung 970 EVO, 960 series, should also work.
 
 ![970 EVO benchmark](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/nvme_bench.png)
 
-Wifi and Bluetooth
+WiFi and Bluetooth
 -----
 
-The included Killer AC1535 wifi/BT card will also not work in macOS as it lacks drivers. **You will need to replace it if you want wifi**, or else get a USB dongle (not recommended). There are a number of compatible cards that can fit into the M.2 E-key slot. A Dell DW1560 or a Lenovo 04X6020 card will fit there fine. Be careful of wider cards like the Dell DW1860, they will not fit. 
+The included Killer AC1535 WiFi/BT card will also not work in macOS as it lacks drivers. **You will need to replace it if you want WiFi**, or else get a USB dongle (not recommended). There are a number of compatible cards that can fit into the M.2 E-key slot. A Dell DW1560 or a Lenovo 04X6020 card will fit there fine. Be careful of wider cards like the Dell DW1860, they will not fit.
 
-Both of the cards I mentioned (I got the 04X6020) use a Broadcom BCM94352Z, which works for me using AirportBrcmFixup and BrcmBluetoothInjector+BrcmPatchRam2 for Wifi and Bluetooth respectively. I have used Airdrop fine with this card, and continuity seems to work too. Note: the included BrcmPatchRam2 is from headkaze's fork for Catalina compatibility. I've heard reports that the DW1820a does not work well, despite being a chipset that is supposedly compatible.
+Both of the cards I mentioned (I got the 04X6020) use a Broadcom BCM94352Z, which works for me using `AirportBrcmFixup.kext` and `BrcmBluetoothInjector.kext` + `BrcmPatchRam2.kext` for WiFi and Bluetooth respectively. I have used Airdrop fine with this card, and continuity seems to work too. Note: the included `BrcmPatchRam2.kext` is from headkaze's fork for Catalina compatibility. I've heard reports that the DW1820a does not work well, despite being a chipset that is supposedly compatible.
 
 ![bluetooth and wifi status from sys profiler](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/bt_wifi_info.png)
 
 Sleep
 -----
 
-Without any patching, sleep works for the most part. You can trigger sleep by shutting the lid and wake it by opening the lid, much like a real mac. However, due to some EC issue, the lid is reported as closed after the computer wakes up. This causes it to go back to sleep about 10 seconds after it wakes up, making the computer almost unusable. Additionally, since the computer thinks the lid is closed, it'll keep the backlight off. This can be partially remedied by removing the PNLF SSDT. 
+Without any patching, sleep works for the most part. You can trigger sleep by shutting the lid and wake it by opening the lid, much like a real mac. However, due to some EC issue, the lid is reported as closed after the computer wakes up. This causes it to go back to sleep about 10 seconds after it wakes up, making the computer almost unusable. Additionally, since the computer thinks the lid is closed, it'll keep the backlight off. This can be partially remedied by removing `SSDT-PNLF.dsl`.
 
-I had some issues with USB devices causing instant wake, I patched GPRW calls (see the two patches in the DSDT Patches section of the plist) to prevent this from happening, although that prevents some USB devices from waking the computer for example when you tap the keyboard to wake. Additionally, I had to disable network wake in Energy Saver and bluetooth wake in the advanced section of bluetooth preferences. I'm still tracking down a few rare random wakes. The SSDT-DLAN adds a status method to the GLAN device to disable it as that was referenced a couple times in the wake reason.
+I had some issues with USB devices causing instant wake, I patched GPRW calls (see the two patches in the DSDT Patches section of the plist) to prevent this from happening, although that prevents some USB devices from waking the computer for example when you tap the keyboard to wake. Additionally, I had to disable network wake in Energy Saver and bluetooth wake in the advanced section of bluetooth preferences. I'm still tracking down a few rare random wakes. The `SSDT-DLAN.dsl` adds a status method to the GLAN device to disable it as that was referenced a couple times in the wake reason.
 
-With the last DSDT patch in the config.plist, I force the lid status to "open" right as the computer wakes up. This means it won't go back to sleep and also the screen is not black after waking. I can keep brightness control and also have proper sleep/wake. I'm quite happy to have finally fixed this issue.
+With the last DSDT patch in the `config.plist`, I force the lid status to "open" right as the computer wakes up. This means it won't go back to sleep and also the screen is not black after waking. I can keep brightness control and also have proper sleep/wake. I'm quite happy to have finally fixed this issue.
 
-If you're interested in how this is done, I tried many different manual DSDT edits until I got the behavior I wanted. This only requires one small change near the end of the `RWAK` function, which is called whever the computer wakes up. The offending code is this:
+If you're interested in how this is done, I tried many different manual DSDT edits until I got the behavior I wanted. This only requires one small change near the end of the `RWAK` function, which is called whenever the computer wakes up. The offending code is this:
 
 ```
 Store (\_SB.PCI0.LPCB.EC0.PSTA, Local0)
@@ -128,7 +125,7 @@ In order to have a clean patch and not have a modified DSDT injected via clover 
 Store (One, LIDS)
 ```
 
-This patch works great in DSDT form and it also retains the exact same length so both Clover and OpenCore can patch it on the fly. I do need to be careful however, as simply patching the Store instruction messes up other things. In the EC0 device, there are two EC query methods that execute some similar code to the original block. The difference is that because the queries are within the scope of the EC, they have a different Notify instruction. My patch had to include the first part of the Notify instruction to differentiate it fron the other two. It turns out that patching the other two breaks lid wake and sleep, which I did not want to do.
+This patch works great in DSDT form and it also retains the exact same length so both Clover and OpenCore can patch it on the fly. I do need to be careful however, as simply patching the Store instruction messes up other things. In the EC0 device, there are two EC query methods that execute some similar code to the original block. The difference is that because the queries are within the scope of the EC, they have a different Notify instruction. My patch had to include the first part of the Notify instruction to differentiate it from the other two. It turns out that patching the other two breaks lid wake and sleep, which I did not want to do.
 
 Be aware that if you use TbtForcePower (not included, discussed in the Thunderbolt section) with your thunderbolt port enabled in the UEFI, it will likely break sleep due to USB errors. Also I have heard from some Stealth owners that their DSDT does not reference `LIDS` anywhere in `RWAK`. This means the sleep fix may not work for everyone.
 
@@ -139,9 +136,9 @@ Per another person with a Stealth, their DSDT did not contain the relevant lid c
 Trackpad
 -----
 
-It's a Synaptics 1A586757 multitouch I2C trackpad, so I simply used VoodooI2C plus VoodooI2CHID with an SSDT-XOSI to enable the I2C controller. All the native multitouch gestures work great, even three finger click-and-drag. Its not quite as sensitive as my MBP trackpad, but its better than I expected on a hackintosh. Right click is a little finnicky if you don't tap with two fingers. I'm also using an old version of Voodoo as the newest one has some bugs with click and drag on this trackpad. However, I have heard that others with this laptop have been able to use the latest VoodooI2C just fine with properly working right click.
+It's a Synaptics 1A586757 multitouch I2C trackpad, so I simply used VoodooI2C plus VoodooI2CHID with `SSDT-XOSI.dsl` to enable the I2C controller. All the native multitouch gestures work great, even three finger click-and-drag. Its not quite as sensitive as my MBP trackpad, but its better than I expected on a hackintosh. Right click is a little finnicky if you don't tap with two fingers. I'm also using an old version of Voodoo as the newest one has some bugs with click and drag on this trackpad. However, I have heard that others with this laptop have been able to use the latest VoodooI2C just fine with properly working right click.
 
-Note about VoodooI2C: a common issue I've heard from other users is the kext simply not loading even with the proper DSDT patches. While unconventional, it seems that rebuilding the kext cache (even if you do not install any third part kexts in there) actually fixes this and allows voodoo to load. 
+Note about VoodooI2C: a common issue I've heard from other users is the kext simply not loading even with the proper DSDT patches. While unconventional, it seems that rebuilding the kext cache (even if you do not install any third part kexts in there) actually fixes this and allows voodoo to load.
 
 Touchscreen
 -----
@@ -164,16 +161,16 @@ hda-verb 0x21 SET_UNSOLICITED_ENABLE 0x83
 USB
 -----
 
-Using just USBInjectAll, I had full USB capabilities out of the box on the USB 3 ports. I did decide to map the ports anyway with an SSDT-UIAC to hide the webcam and some unused ports. Delete this file if you have issues with USB or want to be able to use your webcam. As for the USB C port, it's on a different controller which is only active when Thunderbolt is enabled and force-powered on (see the Thunderbolt section). This causes sleep issues an USB driver crashes, so I would not recommend it. Additionally, USB-C stops working after I sleep.
+Using just `USBInjectAll.kext`, I had full USB capabilities out of the box on the USB 3 ports. I did decide to map the ports anyway with `SSDT-UIAC.dsl` to hide the webcam and some unused ports. Delete this file if you have issues with USB or want to be able to use your webcam. As for the USB C port, it's on a different controller which is only active when Thunderbolt is enabled and force-powered on (see the Thunderbolt section). This causes sleep issues an USB driver crashes, so I would not recommend it. Additionally, USB-C stops working after I sleep.
 
-I used the [USBMap](https://github.com/corpnewt/USBMap) script to create the UIAC and USBX SSDTs. You may need to run it yourself to properly map USB ports if they end up being different on your system.
+I used the [USBMap](https://github.com/corpnewt/USBMap) script to create `SSDT-UIAC.dsl` and `SSDT-USBX.dsl`. You may need to run it yourself to properly map USB ports if they end up being different on your system.
 
 ![the USB ports i mapped](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/usbmap_info.png)
 
 Battery
 -----
 
-Using a DSDT patch in the MaciASL patch repo named "bat - Razer Blade (2014)", and SMCBatteryManager, I was able to get battery status and precentage working. I incorporated the patched methods into an SSDT hotpatch (see SSDT-BATT). The power management works well and the battery lasts a while. I'm not sure if this is normal for hackintoshes but my battery cycle count has always showed 0.
+Using a DSDT patch in the MaciASL patch repo named "bat - Razer Blade (2014)", and SMCBatteryManager, I was able to get battery status and percentage working. I incorporated the patched methods into an SSDT hotpatch `SSDT-BATT.dsl`. The power management works well and the battery lasts a while. I'm not sure if this is normal for hackintoshes but my battery cycle count has always showed 0.
 
 ![battery info](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/battery_info.png)
 
@@ -198,7 +195,7 @@ In the UEFI firmware, I needed to disable these options to get a usable system:
 - Fast boot
 - Launch CSM
 
-Thuderbolt can be turned on but it causes a number of issues and doesn't seem to work in macOS anyway (as reported by someone who tried a TB device on this computer).
+Thunderbolt can be turned on but it causes a number of issues and doesn't seem to work in macOS anyway (as reported by someone who tried a TB device on this computer).
 
 Stuff in this repo
 ---
@@ -212,6 +209,8 @@ The `SSDTs` folder has the uncompiled versions of the SSDTs that I had to create
 The `extra` folder contains the command-line apps I compiled to be able to change the keyboard color. See "keyboard illumination" above.
 
 The `images` folder has, among other things, the desktop I edited based on the [default Razer desktop](http://assets.razerzone.com/eedownloads/desktop-wallpapers/Wave-3200x1800.png) with an Apple logo. I also added the image I used to replace the system logo in About This Mac (using [this guide](https://github.com/Haru-tan/Hackintosh-Things/blob/master/AboutThisMacMojave.md)). Also, a number of screenshots found in this readme.
+
+The `themes` folder has good 4K themes that I use as default.
 
 Conclusion?
 ---
