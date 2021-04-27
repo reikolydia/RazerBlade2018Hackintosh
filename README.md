@@ -1,6 +1,10 @@
 Razer Blade Stealth (2018) hackintosh
 ===
 
+![GitHub last commit](https://img.shields.io/github/last-commit/nnk95/RazerBlade2018Hackintosh?style=for-the-badge)
+
+---
+
 ![about this mac image](https://github.com/red-green/razer_blade_stealth_hackintosh/raw/master/images/about.png)
 
 Intro
